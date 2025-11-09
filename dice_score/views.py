@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import tempfile
 from pathlib import Path
@@ -9,6 +10,8 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+
+logger = logging.getLogger(__name__)
 
 
 def calculate_dice_score(pred_array, ref_array):
@@ -125,4 +128,5 @@ def calculate_dice(request):
                 os.unlink(tmp_file_path)
     
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+        logger.error(f"Error calculating dice score: {str(e)}", exc_info=True)
+        return JsonResponse({'error': 'An internal error occurred while processing the request'}, status=500)
