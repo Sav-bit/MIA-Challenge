@@ -1,0 +1,13 @@
+name: mia-challenge
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - django=4.2
+  - numpy=1.24
+  - nibabel=5.1
+  - scipy=1.11
+  - pip
+  - pip:
+    - djangorestframework==3.14.0
