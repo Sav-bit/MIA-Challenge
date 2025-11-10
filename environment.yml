@@ -7,7 +7,7 @@ dependencies:
   - django=4.2
   - numpy=1.24
   - nibabel=5.1
-  - scipy=1.11
+  - simpleitk
   - pip
   - pip:
     - djangorestframework==3.14.0

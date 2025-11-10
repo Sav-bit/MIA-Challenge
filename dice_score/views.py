@@ -10,33 +10,33 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+import SimpleITK as sitk
 
 logger = logging.getLogger(__name__)
 
 
-def calculate_dice_score(pred_array, ref_array):
-    """
-    Calculate Dice score between two binary arrays.
+def calculate_dice_score(prediction : sitk.Image, reference : sitk.Image) -> float:
+    overlap = sitk.LabelOverlapMeasuresImageFilter()
+    overlap.Execute(reference, prediction)
     
-    Dice score = 2 * |A ∩ B| / (|A| + |B|)
-    """
-    # Flatten arrays
-    pred_flat = pred_array.flatten()
-    ref_flat = ref_array.flatten()
-    
-    # Calculate intersection and union
-    intersection = np.sum(pred_flat * ref_flat)
-    sum_pred = np.sum(pred_flat)
-    sum_ref = np.sum(ref_flat)
-    
-    # Handle edge case where both arrays are empty
-    if sum_pred + sum_ref == 0:
-        return 1.0
-    
-    # Calculate Dice score
-    dice = (2.0 * intersection) / (sum_pred + sum_ref)
-    return float(dice)
+    ref = sitk.GetArrayViewFromImage(reference)
+    pred = sitk.GetArrayViewFromImage(prediction)
 
+    labels = sorted(set(ref.ravel()) | set(pred.ravel()))
+    labels = [lab for lab in labels if lab != 0]
+
+    per_class = {}
+    for lab in labels:
+        per_class[lab] = overlap.GetDiceCoefficient(int(lab))
+
+    print(f"Per class dice: {per_class}")
+
+    def macro_dice(per_class_dice):
+        return float(np.mean(list(per_class_dice.values()))) if per_class_dice else 1.0
+    
+    dice = macro_dice(per_class)
+    
+    return dice
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -79,21 +79,11 @@ def calculate_dice(request):
         
         try:
             # Load both NIfTI files
-            pred_img = nib.load(tmp_file_path)
-            ref_img = nib.load(str(reference_path))
+            pred_img = sitk.ReadImage(tmp_file_path)   
+            ref_img = sitk.ReadImage(str(reference_path))
             
-            # Get data arrays
-            pred_data = pred_img.get_fdata()
-            ref_data = ref_img.get_fdata()
             
-            # Check if shapes match
-            if pred_data.shape != ref_data.shape:
-                return JsonResponse({
-                    'error': f'Shape mismatch: uploaded {pred_data.shape} vs reference {ref_data.shape}'
-                }, status=400)
-            
-            # Calculate Dice score
-            dice_score = calculate_dice_score(pred_data, ref_data)
+            dice_score = calculate_dice_score(pred_img, ref_img)
             
             # Prepare result
             result = {
