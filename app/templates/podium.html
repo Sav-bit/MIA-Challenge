@@ -1,395 +1,429 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Dice Score Podium</title>
-  <link href="https://fonts.googleapis.com/css2?family=Raleway&family=Roboto&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dice Score Podium</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Raleway&family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
 
-  <style>
-    body {
-      font-size: 16px;
-      background: #fafafa;
-      font-family: "Roboto", sans-serif;
-      font-weight: 300;
-      margin: 0;
-      padding: 2rem 0;
-    }
+    <style>
+      body {
+        font-size: 16px;
+        background: #fafafa;
+        font-family: "Roboto", sans-serif;
+        font-weight: 300;
+        margin: 0;
+        padding: 2rem 0;
+      }
 
-    h1 {
-      font-family: "Raleway", sans-serif;
-      font-weight: 400;
-      text-align: center;
-      margin-bottom: 1rem;
-    }
+      h1 {
+        font-family: "Raleway", sans-serif;
+        font-weight: 400;
+        text-align: center;
+        margin-bottom: 1rem;
+      }
 
-    .scoreboard {
-      border-radius: 5px;
-      display: flex;
-      max-width: 1170px;
-      margin: 0 auto;
-      padding: 3rem 50px;
-      flex-direction: column;
-      background: #fafafa;
-    }
+      .scoreboard {
+        border-radius: 5px;
+        display: flex;
+        max-width: 1170px;
+        margin: 0 auto;
+        padding: 3rem 50px;
+        flex-direction: column;
+        background: #fafafa;
+      }
 
-    .scoreboard__podiums {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-around;
-      margin: 20px auto 40px auto;
-      min-height: 350px;
-      width: 100%;
-    }
+      .scoreboard__podiums {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        margin: 20px auto 40px auto;
+        min-height: 350px;
+        width: 100%;
+      }
 
-    .scoreboard__podium {
-      margin: 0 20px;
-      display: flex;
-      flex-direction: column;
-      align-self: flex-end;
-      flex-wrap: wrap;
-      flex: 1;
-      opacity: 0;
-      position: relative;
-      top: -10px;
-      transition: all 500ms ease-in-out;
-    }
+      .scoreboard__podium {
+        margin: 0 20px;
+        display: flex;
+        flex-direction: column;
+        align-self: flex-end;
+        flex-wrap: wrap;
+        flex: 1;
+        opacity: 0;
+        position: relative;
+        top: -10px;
+        transition: all 500ms ease-in-out;
+      }
 
-    .scoreboard__podium.is-visible {
-      top: 0;
-      opacity: 1;
-    }
+      .scoreboard__podium.is-visible {
+        top: 0;
+        opacity: 1;
+      }
 
-    .scoreboard__podium-base {
-      height: 0;
-      background: #ececec; /* $gray */
-      color: #fff;
-      min-width: 150px;
-      border-radius: 5px;
-      transition: height 1000ms ease-in-out, opacity 1000ms ease-in-out;
-      opacity: 0;
-      position: relative;
-    }
+      .scoreboard__podium-base {
+        height: 0;
+        background: #ececec; /* $gray */
+        color: #fff;
+        min-width: 150px;
+        border-radius: 5px;
+        transition: height 1000ms ease-in-out, opacity 1000ms ease-in-out;
+        opacity: 0;
+        position: relative;
+      }
 
-    .scoreboard__podium-base.is-expanding {
-      opacity: 1;
-    }
+      .scoreboard__podium-base.is-expanding {
+        opacity: 1;
+      }
 
-    .scoreboard__podium-base--first {
-      background: linear-gradient(to bottom, #BD4F6C 0%, #8b374f 100%); /* $first */
-    }
+      .scoreboard__podium-base--first {
+        background: linear-gradient(
+          to bottom,
+          #bd4f6c 0%,
+          #8b374f 100%
+        ); /* $first */
+      }
 
-    .scoreboard__podium-base--second {
-      background: linear-gradient(to bottom, #F0CF65 0%, #c7ab4f 100%); /* $second */
-    }
+      .scoreboard__podium-base--second {
+        background: linear-gradient(
+          to bottom,
+          #f0cf65 0%,
+          #c7ab4f 100%
+        ); /* $second */
+      }
 
-    .scoreboard__podium-base--third {
-      background: linear-gradient(to bottom, #5E9EAD 0%, #467786 100%); /* $third */
-    }
+      .scoreboard__podium-base--third {
+        background: linear-gradient(
+          to bottom,
+          #5e9ead 0%,
+          #467786 100%
+        ); /* $third */
+      }
 
-    .scoreboard__podium-rank {
-      font-size: 4rem;
-      font-weight: 700;
-      position: absolute;
-      left: 50%;
-      bottom: 0;
-      transform: translate(-50%, -50%);
-    }
+      .scoreboard__podium-rank {
+        font-size: 4rem;
+        font-weight: 700;
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        transform: translate(-50%, -50%);
+      }
 
-    .scoreboard__podium-number {
-      text-align: center;
-      font-size: 1.2rem;
-      margin-top: 10px;
-    }
+      .scoreboard__podium-number {
+        text-align: center;
+        font-size: 1.2rem;
+        margin-top: 10px;
+      }
 
-    .scoreboard__podium-number small {
-      display: block;
-      font-size: 60%;
-      color: #333;
-      line-height: 1.5;
-      text-transform: uppercase;
-    }
+      .scoreboard__podium-number small {
+        display: block;
+        font-size: 60%;
+        color: #333;
+        line-height: 1.5;
+        text-transform: uppercase;
+      }
 
-    .bump {
-      animation: bump 500ms ease-in-out;
-    }
+      .bump {
+        animation: bump 500ms ease-in-out;
+      }
 
-    @keyframes bump {
-      0% {}
-      50% { transform: scale(1.1); }
-      60% { transform: scale(1); }
-    }
+      @keyframes bump {
+        0% {
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        60% {
+          transform: scale(1);
+        }
+      }
 
-    /* Optional leaderboard below podium */
-    table {
-      margin: 0 auto;
-      border-collapse: collapse;
-      width: 80%;
-      max-width: 800px;
-      background: white;
-    }
+      /* Optional leaderboard below podium */
+      table {
+        margin: 0 auto;
+        border-collapse: collapse;
+        width: 80%;
+        max-width: 800px;
+        background: white;
+      }
 
-    th, td {
-      border: 1px solid #ccc;
-      padding: 0.5rem 0.75rem;
-      text-align: center;
-    }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 0.5rem 0.75rem;
+        text-align: center;
+      }
 
-    th {
-      background: #eee;
-    }
+      th {
+        background: #eee;
+      }
 
-    .credits {
-      font-size: 14px;
-      text-align: center;
-      margin: 20px 0;
-      color: #777;
-    }
+      .credits {
+        font-size: 14px;
+        text-align: center;
+        margin: 20px 0;
+        color: #777;
+      }
 
-    /* emoji particle styles */
-    .emoji-particle {
-      position: fixed;
-      left: 50%;
-      top: -10vh;
-      pointer-events: none;
-      transform: translateX(-50%);
-      will-change: transform, opacity;
-      z-index: 999999; /* sit above confetti canvas */
-      display: inline-block;
-      backface-visibility: hidden;
-    }
+      /* emoji particle styles */
+      .emoji-particle {
+        position: fixed;
+        left: 50%;
+        top: -10vh;
+        pointer-events: none;
+        transform: translateX(-50%);
+        will-change: transform, opacity;
+        z-index: 999999; /* sit above confetti canvas */
+        display: inline-block;
+        backface-visibility: hidden;
+      }
 
-    @keyframes emoji-fall {
-      0%   { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-      80%  { opacity: 1; }
-      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-    }
-  </style>
-</head>
-<body>
-  <h1>🧠 MIA segmentation challenge 🧠</h1>
+      @keyframes emoji-fall {
+        0% {
+          transform: translateY(-10vh) rotate(0deg);
+          opacity: 1;
+        }
+        80% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(110vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🧠 MIA segmentation challenge 🧠</h1>
 
-  <div class="scoreboard">
-    <div class="scoreboard__podiums">
-      {# SECOND PLACE #}
-      {% if top3|length > 1 %}
-      <div class="scoreboard__podium js-podium" data-height="200">
-        <div class="scoreboard__podium-base scoreboard__podium-base--second">
-          <div class="scoreboard__podium-rank">2</div>
+    <div class="scoreboard">
+      <div class="scoreboard__podiums">
+        {# SECOND PLACE #} {% if top3|length > 1 %}
+        <div class="scoreboard__podium js-podium" data-height="200">
+          <div class="scoreboard__podium-base scoreboard__podium-base--second">
+            <div class="scoreboard__podium-rank">2</div>
+          </div>
+          <div class="scoreboard__podium-number">
+            {{ top3[1].name }}
+            <small
+              ><span class="js-podium-data"
+                >{{ "%.3f"|format(top3[1].score) }}</span
+              ></small
+            >
+          </div>
         </div>
-        <div class="scoreboard__podium-number">
-          {{ top3[1].name }}
-          <small><span class="js-podium-data">{{ "%.3f"|format(top3[1].score) }}</span></small>
+        {% endif %} {# FIRST PLACE #} {% if top3|length > 0 %}
+        <div class="scoreboard__podium js-podium" data-height="250">
+          <div class="scoreboard__podium-base scoreboard__podium-base--first">
+            <div class="scoreboard__podium-rank">1</div>
+          </div>
+          <div class="scoreboard__podium-number">
+            {{ top3[0].name }}
+            <small
+              ><span class="js-podium-data"
+                >{{ "%.3f"|format(top3[0].score) }}</span
+              ></small
+            >
+          </div>
         </div>
+        {% endif %} {# THIRD PLACE #} {% if top3|length > 2 %}
+        <div class="scoreboard__podium js-podium" data-height="150">
+          <div class="scoreboard__podium-base scoreboard__podium-base--third">
+            <div class="scoreboard__podium-rank">3</div>
+          </div>
+          <div class="scoreboard__podium-number">
+            {{ top3[2].name }}
+            <small
+              ><span class="js-podium-data"
+                >{{ "%.3f"|format(top3[2].score) }}</span
+              ></small
+            >
+          </div>
+        </div>
+        {% endif %}
       </div>
-      {% endif %}
 
-      {# FIRST PLACE #}
-      {% if top3|length > 0 %}
-      <div class="scoreboard__podium js-podium" data-height="250">
-        <div class="scoreboard__podium-base scoreboard__podium-base--first">
-          <div class="scoreboard__podium-rank">1</div>
-        </div>
-        <div class="scoreboard__podium-number">
-          {{ top3[0].name }}
-          <small><span class="js-podium-data">{{ "%.3f"|format(top3[0].score) }}</span></small>
-        </div>
-      </div>
-      {% endif %}
-
-      {# THIRD PLACE #}
-      {% if top3|length > 2 %}
-      <div class="scoreboard__podium js-podium" data-height="150">
-        <div class="scoreboard__podium-base scoreboard__podium-base--third">
-          <div class="scoreboard__podium-rank">3</div>
-        </div>
-        <div class="scoreboard__podium-number">
-          {{ top3[2].name }}
-          <small><span class="js-podium-data">{{ "%.3f"|format(top3[2].score) }}</span></small>
-        </div>
-      </div>
+      {% if others %}
+      <h2 style="text-align: center; margin-bottom: 1rem">Leaderboard</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in others %}
+          <tr>
+            <td>{{ loop.index + 3 }}</td>
+            <td>{{ entry.name }}</td>
+            <td>{{ "%.3f"|format(entry.score) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
       {% endif %}
     </div>
 
-    {% if others %}
-    <h2 style="text-align:center; margin-bottom: 1rem;">Leaderboard</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Rank</th>
-          <th>Name</th>
-          <th>Score</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for entry in others %}
-        <tr>
-          <td>{{ loop.index + 3 }}</td>
-          <td>{{ entry.name }}</td>
-          <td>{{ "%.3f"|format(entry.score) }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% endif %}
-  </div>
+    <div class="credits">
+      Scores based on Dice coefficient from uploaded segmentations.
+    </div>
 
-  <div class="credits">
-    Scores based on Dice coefficient from uploaded segmentations.
-  </div>
-
- <script>
-    const defaults = {
+    <script>
+      const defaults = {
         spread: 360,
         ticks: 100,
         gravity: 0,
         decay: 0.94,
         startVelocity: 30,
-    };
+      };
 
-    function shoot() {
-
+      function shoot() {
         // 3) Side bursts (left + right), slightly staggered
         const sideDefaults = {
-            ...defaults,
-            particleCount: 50,
-            spread: 55,
-            ticks: 100,
+          ...defaults,
+          particleCount: 50,
+          spread: 55,
+          ticks: 100,
         };
 
         // Left side, shooting diagonally toward center
         setTimeout(() => {
-            confetti({
-                ...sideDefaults,
-                angle: 60,               // towards top-right
-                origin: { x: 0, y: 0.7 } // from left edge, lower on screen
-            });
+          confetti({
+            ...sideDefaults,
+            angle: 60, // towards top-right
+            origin: { x: 0, y: 0.7 }, // from left edge, lower on screen
+          });
         }, 150);
 
         // Right side, shooting diagonally toward center
         setTimeout(() => {
-            confetti({
-                ...sideDefaults,
-                angle: 120,              // towards top-left
-                origin: { x: 1, y: 0.7 } // from right edge, lower on screen
-            });
+          confetti({
+            ...sideDefaults,
+            angle: 120, // towards top-left
+            origin: { x: 1, y: 0.7 }, // from right edge, lower on screen
+          });
         }, 250);
 
         // 4) DOM emoji fallback / enhancement
         shootEmoji(24);
-    }
+      }
 
-    // create floating emoji DOM particles as a fallback/visual enhancement
-    function shootEmoji(count = 20) {
+      // create floating emoji DOM particles as a fallback/visual enhancement
+      function shootEmoji(count = 20) {
         const emojis = ["🩻", "🧠"];
         for (let i = 0; i < count; i++) {
-            const el = document.createElement('span');
-            el.className = 'emoji-particle';
-            el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+          const el = document.createElement("span");
+          el.className = "emoji-particle";
+          el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
 
-            const size = 18 + Math.floor(Math.random() * 36); // 18px - 54px
-            el.style.fontSize = size + 'px';
+          const size = 18 + Math.floor(Math.random() * 36); // 18px - 54px
+          el.style.fontSize = size + "px";
 
-            // horizontal spread around center (in vw)
-            const offsetVw = (Math.random() - 0.5) * 80; // -40vw .. +40vw
-            el.style.left = `calc(50% + ${offsetVw}vw)`;
+          // horizontal spread around center (in vw)
+          const offsetVw = (Math.random() - 0.5) * 80; // -40vw .. +40vw
+          el.style.left = `calc(50% + ${offsetVw}vw)`;
 
-            const duration = 2500 + Math.floor(Math.random() * 2000); // 2.5s - 4.5s
-            const delay = Math.floor(Math.random() * 400); // stagger
+          const duration = 2500 + Math.floor(Math.random() * 2000); // 2.5s - 4.5s
+          const delay = Math.floor(Math.random() * 400); // stagger
 
-            el.style.animation = `emoji-fall ${duration}ms linear ${delay}ms forwards`;
+          el.style.animation = `emoji-fall ${duration}ms linear ${delay}ms forwards`;
 
-            document.body.appendChild(el);
+          document.body.appendChild(el);
 
-            // cleanup after animation completes
-            setTimeout(() => {
-                el.remove();
-            }, duration + delay + 100);
+          // cleanup after animation completes
+          setTimeout(() => {
+            el.remove();
+          }, duration + delay + 100);
         }
-    }
+      }
 
-    // Simple vanilla JS to animate the podiums with suspense:
-    // third -> second -> first, with growing delay
-    document.addEventListener('DOMContentLoaded', () => {
+      // Simple vanilla JS to animate the podiums with suspense:
+      // third -> second -> first, with growing delay
+      document.addEventListener("DOMContentLoaded", () => {
         // Get podiums and sort by rank (3,2,1)
-        const podiums = Array.from(document.querySelectorAll('.js-podium'));
+        const podiums = Array.from(document.querySelectorAll(".js-podium"));
 
         // Extract rank from the .scoreboard__podium-rank element
         const sortedByRank = podiums.sort((a, b) => {
-            const rankA = parseInt(
-                a.querySelector('.scoreboard__podium-rank').textContent.trim(),
-                10
-            );
-            const rankB = parseInt(
-                b.querySelector('.scoreboard__podium-rank').textContent.trim(),
-                10
-            );
-            // We want 3 -> 2 -> 1 (highest number first)
-            return rankB - rankA;
+          const rankA = parseInt(
+            a.querySelector(".scoreboard__podium-rank").textContent.trim(),
+            10
+          );
+          const rankB = parseInt(
+            b.querySelector(".scoreboard__podium-rank").textContent.trim(),
+            10
+          );
+          // We want 3 -> 2 -> 1 (highest number first)
+          return rankB - rankA;
         });
 
         // progressively increasing delay
-        let baseDelay = 600;   // delay before showing 3rd
-        let step = 900;        // additional delay to next
-        let growth = 400;      // how much step grows each time
+        let baseDelay = 600; // delay before showing 3rd
+        let step = 900; // additional delay to next
+        let growth = 400; // how much step grows each time
 
         // Promises so we can detect when all podiums have finished expanding
         const resolvers = [];
         const promises = sortedByRank.map(() => {
-            let resolveFn;
-            const p = new Promise(resolve => { resolveFn = resolve; });
-            resolvers.push(resolveFn);
-            return p;
+          let resolveFn;
+          const p = new Promise((resolve) => {
+            resolveFn = resolve;
+          });
+          resolvers.push(resolveFn);
+          return p;
         });
 
         sortedByRank.forEach((podium, idx) => {
-            const delay = baseDelay;
+          const delay = baseDelay;
 
-            setTimeout(() => {
-                podium.classList.add('is-visible');
-                const height = podium.getAttribute('data-height'); // in px
-                const base = podium.querySelector('.scoreboard__podium-base');
-                if (base) {
-                    // start expansion
-                    base.style.height = height + 'px';
-                    base.classList.add('is-expanding');
+          setTimeout(() => {
+            podium.classList.add("is-visible");
+            const height = podium.getAttribute("data-height"); // in px
+            const base = podium.querySelector(".scoreboard__podium-base");
+            if (base) {
+              // start expansion
+              base.style.height = height + "px";
+              base.classList.add("is-expanding");
 
-                    // resolve when the CSS height transition ends (fallback to timeout)
-                    const onTransition = (e) => {
-                        if (e.propertyName === 'height') {
-                            base.removeEventListener('transitionend', onTransition);
-                            resolvers[idx](); // signal this podium finished
-                        }
-                    };
-                    base.addEventListener('transitionend', onTransition);
-
-                    // fallback in case transitionend doesn't fire
-                    setTimeout(() => {
-                        try { resolvers[idx](); } catch (e) {}
-                    }, 1400);
-                } else {
-                    // if no base, resolve immediately
-                    resolvers[idx]();
+              // resolve when the CSS height transition ends (fallback to timeout)
+              const onTransition = (e) => {
+                if (e.propertyName === "height") {
+                  base.removeEventListener("transitionend", onTransition);
+                  resolvers[idx](); // signal this podium finished
                 }
+              };
+              base.addEventListener("transitionend", onTransition);
 
-                // little bump for extra suspense
-                podium.classList.add('bump');
-                setTimeout(() => podium.classList.remove('bump'), 600);
-            }, delay);
+              // fallback in case transitionend doesn't fire
+              setTimeout(() => {
+                try {
+                  resolvers[idx]();
+                } catch (e) {}
+              }, 1400);
+            } else {
+              // if no base, resolve immediately
+              resolvers[idx]();
+            }
 
-            // update delay and step for the next podium
-            baseDelay += step;
-            step += growth;
+            // little bump for extra suspense
+            podium.classList.add("bump");
+            setTimeout(() => podium.classList.remove("bump"), 600);
+          }, delay);
+
+          // update delay and step for the next podium
+          baseDelay += step;
+          step += growth;
         });
 
         // When all podiums' expansions are done, trigger confetti
         Promise.all(promises).then(() => {
-            setTimeout(() => shoot(), 150);
+          setTimeout(() => shoot(), 150);
         });
-    });
-</script>
-
-
-
-</body>
+      });
+    </script>
+  </body>
 </html>
