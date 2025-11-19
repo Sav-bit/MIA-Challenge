@@ -31,7 +31,7 @@ def calculate_dice_score(prediction : sitk.Image, reference : sitk.Image) -> flo
 
     print(f"Per class dice: {per_class}")
 
-    def macro_dice(per_class_dice):
+    def macro_dice(per_class_dice) -> float:
         return float(np.mean(list(per_class_dice.values()))) if per_class_dice else 1.0
     
     dice = macro_dice(per_class)
