@@ -22,7 +22,7 @@ The server runs entirely in Docker — **you do NOT need Python installed**.
 ### 1. Clone this repository
 
 ```bash
-git clone https://github.com/<your_repo>/MIA-Challenge.git
+git clone https://github.com/Sav-bit/MIA-Challenge.git
 cd MIA-Challenge
 ```
 
