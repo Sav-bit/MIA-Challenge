@@ -1,0 +1,11 @@
+services:
+  mia-challenge:
+    build: .
+    container_name: mia-challenge
+    ports:
+      - "8000:8000"
+    volumes:
+      - mia_challenge_results:/app/data
+
+volumes:
+  mia_challenge_results:
