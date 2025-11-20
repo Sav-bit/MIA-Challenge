@@ -213,3 +213,6 @@ __marimo__/
 *.DICOM
 *.nii
 *.nii.gz
+
+*.DS_Store
+*results.json
