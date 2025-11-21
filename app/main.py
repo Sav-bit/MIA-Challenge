@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+import re
 import tempfile
 from pathlib import Path
 from typing import Dict
@@ -18,6 +19,8 @@ app = FastAPI()
 REFERENCE_FILE = Path(os.getenv("REFERENCE_FILE", "data/test_data_reference.npz"))
 RESULTS_FILE = Path(os.getenv("RESULTS_FILE", "data/results.json"))
 templates = Jinja2Templates(directory="app/templates")
+NAME_RE = re.compile(r"^[A-Za-z0-9 _\-\.\(\)]{1,40}$")
+MAX_BYTES = 1 * 1024 * 1024 # 1 MB
 
 # Load reference once at startup
 if not REFERENCE_FILE.exists():
@@ -119,6 +122,16 @@ def calculate_mean_dice_from_npz(
 
 @app.post("/dice-score")
 async def calculate_dice(file: UploadFile = File(...), name: str = Form(...)):
+
+    name = name.strip()
+
+    # Validate name
+    if not NAME_RE.match(name):
+        raise HTTPException(
+            status_code=400,
+            detail="Name must be 1-40 characters long and contain only letters, numbers, spaces, and - _ . ( )",
+        )
+
     if not file.filename.endswith(".npz"):
         raise HTTPException(status_code=400, detail="File must be a .npz file")
 
@@ -126,6 +139,11 @@ async def calculate_dice(file: UploadFile = File(...), name: str = Form(...)):
         # Save uploaded npz temporarily
         with tempfile.NamedTemporaryFile(delete=False, suffix=".npz") as tmp_file:
             contents = await file.read()
+            
+            #If the file is too large, raise an error
+            if len(contents) > MAX_BYTES:
+                raise HTTPException(413, "File too large")
+            
             tmp_file.write(contents)
             tmp_file_path = Path(tmp_file.name)
 
