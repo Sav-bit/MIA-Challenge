@@ -73,10 +73,10 @@ Example:
 ```python
 np.savez_compressed(
     "submission.npz",
-    subj01=pred_subj01,
-    subj02=pred_subj02,
+    subj-01=pred_subj01,
+    subj-02=pred_subj02,
     ...
-    subj23=pred_subj23,
+    subj-23=pred_subj23,
 )
 ```
 
