@@ -216,3 +216,6 @@ __marimo__/
 
 *.DS_Store
 *results.json
+*.npz
+*.npy
+*.zip
